@@ -258,8 +258,8 @@ module Ruby2D
       case o
       when nil
         raise Error, "Cannot add '#{o.class}' to window!"
-      when Entity
-        @entities.push(o)
+      #when Ruby2D::Entity
+        #@entities.push(o)
       when Array
         o.each { |x| add_object(x) }
       else
