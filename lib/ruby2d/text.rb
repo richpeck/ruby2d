@@ -17,7 +17,7 @@ module Ruby2D
       @style = opts[:style]
       self.color = opts[:color] || 'white'
       self.color.opacity = opts[:opacity] if opts[:opacity]
-      @font_path = opts[:font] || Font.default
+      @font_path = opts[:font] || Font.default # error because of path
       create_font
       create_texture
 
@@ -47,7 +47,7 @@ module Ruby2D
       unless opts[:color]
         opts[:color] = [1.0, 1.0, 1.0, 1.0]
       end
-
+      
       render(x: opts[:x], y: opts[:y], color: Color.new(opts[:color]), rotate: opts[:rotate])
     end
 
@@ -57,7 +57,7 @@ module Ruby2D
       vertices = Vertices.new(x, y, @width, @height, rotate)
 
       @texture.draw(
-        vertices.coordinates, vertices.texture_coordinates, color
+        vertices.coordinates, vertices.texture_coordinates, color # <- this is causing the error
       )
     end
 
@@ -66,9 +66,7 @@ module Ruby2D
     end
 
     def create_texture
-      if defined?(@texture)
-        @texture.delete
-      end
+      @texture.delete if @texture
 
       @texture = Texture.new(*Text.ext_load_text(@font.ttf_font, @text))
       @width = @texture.width

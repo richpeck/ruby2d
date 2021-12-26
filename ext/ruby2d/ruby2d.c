@@ -131,18 +131,6 @@ static R2D_Window *window;
 #endif
 
 /*
- * Free font structure stored in the Ruby 2D `Font` class
- */
-#if MRUBY
-static void free_font(mrb_state *mrb, void *p_) {
-  TTF_Font *font = (TTF_Font *)p_;
-#else 
-static void free_font(TTF_Font *font) {
-#endif
-  TTF_CloseFont(font);
-}
-
-/*
  * Function pointer to free the Ruby 2D native window
  */
 static void free_window() {
@@ -377,10 +365,13 @@ static R_VAL ruby2d_circle_ext_draw(R_VAL self, R_VAL a) {
  * Create an SDL surface from an image path, return the surface, width, and height
  */
 #if MRUBY
-  static R_VAL ruby2d_image_ext_load_image(mrb_state* mrb, R_VAL path) {
+  static R_VAL ruby2d_image_ext_load_image(mrb_state* mrb, R_VAL self) {
     R2D_Init();
 
     mrb_value result = mrb_ary_new(mrb);
+
+    mrb_value path;
+    mrb_get_args(mrb, "s", &path);
 
     SDL_Surface *surface = R2D_CreateImageSurface(RSTRING_PTR(path));
     R2D_ImageConvertToRGB(surface);
@@ -412,16 +403,19 @@ static R_VAL ruby2d_circle_ext_draw(R_VAL self, R_VAL a) {
  * Ruby2D::Text#ext_load_text
  */
 #if MRUBY
-  static R_VAL ruby2d_text_ext_load_text(mrb_state* mrb, R_VAL font) {
+  static R_VAL ruby2d_text_ext_load_text(mrb_state* mrb, R_VAL self) {
     R2D_Init();
 
     mrb_value result = mrb_ary_new(mrb);
 
-    mrb_value message;
-    mrb_get_args(mrb, "s", &message);
+    mrb_value font, message;
+    mrb_get_args(mrb, "oo", &font, &message);
 
     TTF_Font *ttf_font;
-    r_data_get_struct(font, "@data", &font_data_type, TTF_Font, ttf_font);
+    Data_Get_Struct(mrb, font, &font_data_type, ttf_font);
+    //r_data_get_struct(self, font, &font_data_type, TTF_Font, ttf_font);
+
+    // #define r_data_get_struct(self, var, mrb_type, rb_type, data)  Data_Get_Struct(mrb, r_iv_get(self, var), mrb_type, data)
 
     SDL_Surface *surface = R2D_TextCreateSurface(ttf_font, RSTRING_PTR(message));
     if (!surface) {
@@ -460,15 +454,16 @@ static R_VAL ruby2d_circle_ext_draw(R_VAL self, R_VAL a) {
  * Ruby2D::Texture#ext_create
  */
 #if MRUBY
-  static R_VAL ruby2d_texture_ext_create(mrb_state* mrb, R_VAL rubySurface) {
+  static R_VAL ruby2d_texture_ext_create(mrb_state* mrb, R_VAL self) {
     GLuint texture_id = 0;
     SDL_Surface *surface;
 
-    mrb_value width, height;
-    mrb_get_args(mrb, "ii", &width, &height);
+    mrb_value rubySurface, width, height;
+    mrb_get_args(mrb, "ooo", &rubySurface, &width, &height);
 
     //Data_Get_Struct(mrb, rubySurface, SDL_Surface, surface);
-    r_data_get_struct(rubySurface, "@data", &surface_data_type, SDL_Surface, surface);
+    Data_Get_Struct(mrb, rubySurface, &surface_data_type, surface);
+    //r_data_get_struct(self, "@data", &surface_data_type, SDL_Surface, surface);
 
     // Detect image mode
     GLint format = GL_RGB;
@@ -766,7 +761,7 @@ static R_VAL ruby2d_music_ext_length(R_VAL self) {
 #if MRUBY
 static R_VAL ruby2d_font_ext_load(mrb_state* mrb, R_VAL self) {
   mrb_value path, size, style;
-  mrb_get_args(mrb, "sis", &path, &size, &style);
+  mrb_get_args(mrb, "ooo", &path, &size, &style);
 #else 
 static R_VAL ruby2d_font_ext_load(R_VAL self, R_VAL path, R_VAL size, R_VAL style) {
 #endif
@@ -787,7 +782,7 @@ static R_VAL ruby2d_font_ext_load(R_VAL self, R_VAL path, R_VAL size, R_VAL styl
 #if MRUBY
 static R_VAL ruby2d_texture_ext_draw(mrb_state* mrb, R_VAL self) {
   mrb_value ruby_coordinates, ruby_texture_coordinates, ruby_color, texture_id;
-  mrb_get_args(mrb, "aaai", &ruby_coordinates, &ruby_texture_coordinates, &ruby_color, &texture_id);
+  mrb_get_args(mrb, "oooo", &ruby_coordinates, &ruby_texture_coordinates, &ruby_color, &texture_id);
 #else
 static R_VAL ruby2d_texture_ext_draw(R_VAL self, R_VAL ruby_coordinates, R_VAL ruby_texture_coordinates, R_VAL ruby_color, R_VAL texture_id) {
 #endif  
@@ -814,6 +809,18 @@ static void free_surface(mrb_state *mrb, void *p_) {
 static void free_surface(SDL_Surface *surface) {
 #endif
   SDL_FreeSurface(surface);
+}
+
+/*
+ * Free font structure stored in the Ruby 2D `Font` class
+ */
+#if MRUBY
+static void free_font(mrb_state *mrb, void *p_) {
+  TTF_Font *font = (TTF_Font *)p_;
+#else 
+static void free_font(TTF_Font *font) {
+#endif
+  TTF_CloseFont(font);
 }
 
 /*

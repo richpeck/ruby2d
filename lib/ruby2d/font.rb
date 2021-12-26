@@ -26,14 +26,15 @@ module Ruby2D
 
       # Find a font file path from its name
       def path(font_name)
-        all_paths.find { |path| path.downcase.include?(font_name) }
+        font = all_paths.find { |path| path.downcase.include?(font_name) }
+        font = File.join(directory, font) if directory.include?('Windows') && RUBY_ENGINE == 'mruby'
+        font
       end
 
       # Get all fonts with full file paths
       def all_paths
-        # MRuby does not have `Dir` defined
         if RUBY_ENGINE == 'mruby'
-          fonts = `find #{directory} -name *.ttf`.split("\n")
+          fonts = Dir.entries(directory)
         # If MRI and/or non-Bash shell (like cmd.exe)
         else
           fonts = Dir["#{directory}/**/*.ttf"]
@@ -47,7 +48,7 @@ module Ruby2D
           f.downcase.include?('black')
         end
 
-        fonts.sort_by { |f| f.downcase.chomp '.ttf' }
+        fonts.select {|font| File.extname(font) == ".ttf" }.sort_by { |f| f.downcase.chomp '.ttf' }
       end
 
       # Get the default font
@@ -55,7 +56,7 @@ module Ruby2D
         if all.include? 'arial'
           path 'arial'
         else
-          all_paths.first
+          all_paths.first 
         end
       end
 
@@ -80,16 +81,12 @@ module Ruby2D
           end
         # If MRuby
         else
-          uname = `uname`
-          if uname.include? 'Darwin'  # macOS
-            macos_font_path
-          elsif uname.include? 'Linux'
-            linux_font_path
-          elsif uname.include? 'MINGW'
-            windows_font_path
-          elsif uname.include? 'OpenBSD'
-            openbsd_font_path
+
+          # RPECK 23/12/2021 -- the uname command was not available on Windows
+          [macos_font_path, linux_font_path, windows_font_path, openbsd_font_path].each do |folder|
+            return folder if File.exists? folder 
           end
+
         end
       end
 
