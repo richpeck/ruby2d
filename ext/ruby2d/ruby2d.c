@@ -503,7 +503,7 @@ static R_VAL ruby2d_circle_ext_draw(R_VAL self, R_VAL a) {
 #if MRUBY
 static R_VAL ruby2d_texture_ext_delete(mrb_state* mrb, R_VAL self) {
   mrb_value rubyTexture_id;
-  mrb_get_args(mrb, "i", &rubyTexture_id);
+  mrb_get_args(mrb, "o", &rubyTexture_id);
 #else 
 static R_VAL ruby2d_texture_ext_delete(R_VAL self, R_VAL rubyTexture_id) {
 #endif
