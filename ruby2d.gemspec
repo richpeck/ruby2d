@@ -1,10 +1,10 @@
 require_relative 'lib/ruby2d/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'ruby2d-rpeck-windows'
+  s.name        = 'ruby2d'
   s.version     = Ruby2D::VERSION
   s.summary     = 'Ruby 2D'
-  s.description = 'Make cross-platform 2D applications in Ruby (changed version RPECK 08/01/2022)'
+  s.description = 'Make cross-platform 2D applications in Ruby'
   s.homepage    = 'http://www.ruby2d.com'
   s.license     = 'MIT'
   s.author      = 'Tom Black'
