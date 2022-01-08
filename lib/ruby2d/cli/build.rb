@@ -62,7 +62,12 @@ end
 def strip_require(file)
   output = ''
   File.foreach(file) do |line|
-    output << line unless line =~ /require ('|")ruby2d('|")/
+    output << line if line !~ /require ('|")ruby2d('|")/ && line !~ /require/
+
+    if line !~ /require ('|")ruby2d('|")/ && line =~ /require/ && line !~ /require_relative/
+      output << File.read(eval(line.gsub("require", "")) + ".rb") 
+      output << " "
+    end
   end
   return output
 end
