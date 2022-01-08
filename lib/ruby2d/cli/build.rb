@@ -102,16 +102,8 @@ def build_native(rb_file)
     f << File.read("#{@gem_dir}/ext/ruby2d/ruby2d.c")
   end
 
-  # Icon
-  if RUBY_PLATFORM =~ /mingw/
-    open('build/icon.rc', 'w') do |f| 
-      f << 'id ICON "icon.ico"'
-    end
-    `windres build/icon.rc build/icon.o`
-  end
-
   # Compile to a native executable
-  `cc build/icon.o build/app.c #{@gem_dir}/ext/ruby2d/common.c #{@gem_dir}/ext/ruby2d/controllers.c #{@gem_dir}/ext/ruby2d/gl.c #{@gem_dir}/ext/ruby2d/gl2.c #{@gem_dir}/ext/ruby2d/gl3.c #{@gem_dir}/ext/ruby2d/gles.c #{@gem_dir}/ext/ruby2d/font.c #{@gem_dir}/ext/ruby2d/image.c #{@gem_dir}/ext/ruby2d/input.c #{@gem_dir}/ext/ruby2d/music.c #{@gem_dir}/ext/ruby2d/shapes.c #{@gem_dir}/ext/ruby2d/sound.c #{@gem_dir}/ext/ruby2d/text.c #{@gem_dir}/ext/ruby2d/window.c -I#{@gem_dir}/ext/ruby2d -I#{@gem_dir}/assets/include -LC:/Dev/mruby-3.0.0/build/host/lib -IC:/MSYS2/mingw64/include/ruby-3.0.0 -IC:/MSYS2/mingw64/include/ruby-3.0.0/x64-mingw32 -IC:/Dev/mruby-3.0.0/include -lmruby -lws2_32 -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lopengl32 -lglew32 -o build/app`
+  `cc build/app.c #{@gem_dir}/ext/ruby2d/common.c #{@gem_dir}/ext/ruby2d/controllers.c #{@gem_dir}/ext/ruby2d/gl.c #{@gem_dir}/ext/ruby2d/gl2.c #{@gem_dir}/ext/ruby2d/gl3.c #{@gem_dir}/ext/ruby2d/gles.c #{@gem_dir}/ext/ruby2d/font.c #{@gem_dir}/ext/ruby2d/image.c #{@gem_dir}/ext/ruby2d/input.c #{@gem_dir}/ext/ruby2d/music.c #{@gem_dir}/ext/ruby2d/shapes.c #{@gem_dir}/ext/ruby2d/sound.c #{@gem_dir}/ext/ruby2d/text.c #{@gem_dir}/ext/ruby2d/window.c -I#{@gem_dir}/ext/ruby2d -I#{@gem_dir}/assets/include -LC:/Dev/mruby-3.0.0/build/host/lib -IC:/MSYS2/mingw64/include/ruby-3.0.0 -IC:/MSYS2/mingw64/include/ruby-3.0.0/x64-mingw32 -IC:/Dev/mruby-3.0.0/include -lmruby -lws2_32 -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lopengl32 -lglew32 -o build/app`
 
   # Clean up
   clean_up unless @debug
