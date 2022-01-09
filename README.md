@@ -1,4 +1,4 @@
-This is the Windows version of Ruby2D that I hacked to get the build pipeline to work.
+This is the Windows version of the Ruby2D gem I hacked to get the build pipeline to work.
 
 I've written about how to get the system set up here: -
 https://www.thefastlaneforum.com/community/threads/how-to-install-ruby2d-on-windows-game-programming.102392/
